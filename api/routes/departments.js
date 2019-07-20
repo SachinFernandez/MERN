@@ -8,8 +8,13 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
+    const department = {
+        departmentId: req.body.departmentId,
+        departmentName: req.body.departmentName
+    }
     res.status(201).json({
-        message: 'Department was created'
+        message: 'Department was created',
+        data: department
     });
 });
 
