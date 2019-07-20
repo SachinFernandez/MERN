@@ -2,9 +2,14 @@ const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const userRoutes = require("./api/routes/users");
 const departmentRoutes = require("./api/routes/departments");
+
+mongoose.connect("mongodb+srv://sachin:" + process.env.MONGO_USER_PWD + "@cluster0-atbqk.mongodb.net/test?retryWrites=true&w=majority", {
+    useNewUrlParser: true
+})
 
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({
