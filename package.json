@@ -1,0 +1,14 @@
+{
+  "name": "mern",
+  "version": "1.0.0",
+  "description": "Mongodb, express, react , node js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sachin",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
