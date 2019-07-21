@@ -6,10 +6,24 @@ const User = require('../models/userModels');
 
 router.get('/', (req, res, next) => {
     User.find()
+    .select("name age _id")
     .exec()
     .then(results => {
-        console.log(results);
-        res.status(200).json(results);
+        const response = {
+            count: results.length,
+            users: results.map(result => {
+                return {
+                    name: result.name,
+                    age: result.age,
+                    _id: result._id,
+                    request: {
+                        type: "GET",
+                        url: "http://localhost:3001/users/" + result._id
+                    }
+                }
+            })
+        }
+        res.status(200).json(response);
     })
     .catch(err => {
         console.log(err);
@@ -28,8 +42,16 @@ router.post('/', (req, res, next) => {
     user.save().then(result => {
         console.log(result);
         res.status(201).json({
-            message: 'Handling POST request to /users',
-            data: user
+            message: 'Users created successfully',
+            data: {
+                name: result.name,
+                age: result.age,
+                _id: result._id,
+                request: {
+                    type: "GET",
+                    url: "http://localhost:3001/users" + result._id
+                }
+            }
         });
     })
     .catch(err => {
@@ -43,11 +65,18 @@ router.post('/', (req, res, next) => {
 router.get('/:userId', (req, res, next) => {
     const id = req.params.userId;
     User.findById(id)
+    .select('name age _id')
     .exec()
     .then(data => {
         console.log("From database", data);
         if (data) {
-        res.status(200).json(data);
+        res.status(200).json({
+            user: data,
+            request: {
+                type: "GET",
+                url: "http://localhost:3001/users"
+            }
+        });
         } else {
             res.status(404).json({message: 'No valid entry found for provided ID'})
         }
@@ -67,8 +96,13 @@ router.patch('/:userId', (req, res, next) => {
     User.update({ _id: id }, { $set: updateOps })
     .exec()
     .then(result => {
-        console.log(result);
-        res.status(200).json(result)
+        res.status(200).json({
+            message: "User updated",
+            request: {
+                type: 'GET',
+                url: "http://localhost:3001/users" + id
+            }
+        })
     })
     .catch(err => {
         console.log(err);
@@ -83,7 +117,14 @@ router.delete('/:userId', (req, res, next) => {
     User.remove({ _id: id })
     .exec()
     .then(result => {
-        res.status(200).json(result);
+        res.status(200).json({
+            message: "User deleted",
+            request: {
+                type: 'POST',
+                url: 'http://localhost:3001/users',
+                body: { name: 'String', age: 'Number'}
+            }
+        });
     })
     .catch(err => {
         console.log(err);

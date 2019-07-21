@@ -11,6 +11,8 @@ mongoose.connect("mongodb+srv://sachin:" + process.env.MONGO_USER_PWD + "@cluste
     useNewUrlParser: true
 })
 
+mongoose.Promise = global.Promise;
+
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({
     extended: false
