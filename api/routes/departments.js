@@ -8,6 +8,7 @@ const User = require('../models/userModels');
 router.get('/', (req, res, next) => {
     Department.find()
     .select('user department_name _id')
+    .populate('user', 'name age')
     .exec()
     .then(results => {
         res.status(200).json({
@@ -73,6 +74,7 @@ router.post("/", (req, res, next) => {
 
 router.get('/:departmentId', (req, res, next) => {
     Department.findById(req.params.departmentId)
+    .populate('user', 'name age')
     .exec()
     .then(result => {
         if(!result) {
