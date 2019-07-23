@@ -1,12 +1,38 @@
 const express = require("express")
 const router = express.Router()
 const mongoose = require('mongoose')
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/');
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.originalname)
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype === "image/jpg") {
+        cb(null, false);
+    } else {
+        cb(null, true);
+    }
+};
+
+const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 1024 * 1024 * 5 
+    },
+    fileFilter: fileFilter
+});
 
 const User = require('../models/userModels');
 
 router.get('/', (req, res, next) => {
     User.find()
-    .select("name age _id")
+    .select("name age _id image ")
     .exec()
     .then(results => {
         const response = {
@@ -15,6 +41,7 @@ router.get('/', (req, res, next) => {
                 return {
                     name: result.name,
                     age: result.age,
+                    image: result.image, 
                     _id: result._id,
                     request: {
                         type: "GET",
@@ -33,11 +60,13 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', upload.single('userImage'), (req, res, next) => {
+    console.log(req.file)
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
-        age: req.body.age
+        age: req.body.age,
+        image: req.file.path
     })
     user.save().then(result => {
         console.log(result);
@@ -46,6 +75,7 @@ router.post('/', (req, res, next) => {
             data: {
                 name: result.name,
                 age: result.age,
+                image: result.image,
                 _id: result._id,
                 request: {
                     type: "GET",
@@ -65,7 +95,7 @@ router.post('/', (req, res, next) => {
 router.get('/:userId', (req, res, next) => {
     const id = req.params.userId;
     User.findById(id)
-    .select('name age _id')
+    .select('name age _id image ')
     .exec()
     .then(data => {
         console.log("From database", data);

@@ -14,6 +14,7 @@ mongoose.connect("mongodb+srv://sachin:" + process.env.MONGO_USER_PWD + "@cluste
 mongoose.Promise = global.Promise;
 
 app.use(morgan("dev"));
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({
     extended: false
 }));
