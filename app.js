@@ -6,10 +6,12 @@ const mongoose = require("mongoose");
 
 const userRoutes = require("./api/routes/users");
 const departmentRoutes = require("./api/routes/departments");
+const adminRoutes =  require("./api/routes/admin.js")
 
 mongoose.connect("mongodb+srv://sachin:" + process.env.MONGO_USER_PWD + "@cluster0-atbqk.mongodb.net/test?retryWrites=true&w=majority", {
     useNewUrlParser: true
 })
+mongoose.set('useCreateIndex', true);
 
 mongoose.Promise = global.Promise;
 
@@ -35,6 +37,7 @@ app.use((req, res, next) => {
 
 app.use("/users", userRoutes);
 app.use("/departments", departmentRoutes);
+app.use("/admin", adminRoutes)
 
 app.use((req, res, next) => {
     const error = new Error("Not found");
