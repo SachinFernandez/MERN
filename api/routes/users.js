@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const mongoose = require('mongoose')
 const multer = require('multer')
+const checkAuth = require('../middleware/check-auth')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -13,7 +14,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    if (file.mimetype === "image/jpg") {
+    if (file.mimetype === "image/jpg" || file.mimetype === 'image/png') {
         cb(null, false);
     } else {
         cb(null, true);
@@ -60,7 +61,7 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.post('/', upload.single('userImage'), (req, res, next) => {
+router.post('/', checkAuth, upload.single('image'), (req, res, next) => {
     console.log(req.file)
     const user = new User({
         _id: new mongoose.Types.ObjectId(),
@@ -117,7 +118,7 @@ router.get('/:userId', (req, res, next) => {
     })
 });
 
-router.patch('/:userId', (req, res, next) => {
+router.patch('/:userId', checkAuth, (req, res, next) => {
     const id = req.params.userId;
     const updateOps = {};
     for( const ops of req.body) {
@@ -142,7 +143,7 @@ router.patch('/:userId', (req, res, next) => {
     })
 });
 
-router.delete('/:userId', (req, res, next) => {
+router.delete('/:userId', checkAuth, (req, res, next) => {
     const id = req.params.userId;
     User.remove({ _id: id })
     .exec()

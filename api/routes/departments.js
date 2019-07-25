@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose")
+const checkAuth = require("../middleware/check-auth")
 
 const Department = require('../models/departmentModels')
 const User = require('../models/userModels');
 
-router.get('/', (req, res, next) => {
+router.get('/', checkAuth, (req, res, next) => {
     Department.find()
     .select('user department_name _id')
     .populate('user', 'name age')
@@ -33,7 +34,7 @@ router.get('/', (req, res, next) => {
     })
 });
 
-router.post("/", (req, res, next) => {
+router.post("/", checkAuth, (req, res, next) => {
     User.findById(req.body.userId)
         .then(user => {
             if(!user) {
@@ -72,7 +73,7 @@ router.post("/", (req, res, next) => {
 });
 
 
-router.get('/:departmentId', (req, res, next) => {
+router.get('/:departmentId', checkAuth, (req, res, next) => {
     Department.findById(req.params.departmentId)
     .populate('user', 'name age')
     .exec()
@@ -101,7 +102,7 @@ router.get('/:departmentId', (req, res, next) => {
     })
 });
 
-router.delete('/:departmentId', (req, res, next) => {
+router.delete('/:departmentId', checkAuth, (req, res, next) => {
     Department.remove({ _id: req.params.departmentId })
     .exec()
     .then(result => {
